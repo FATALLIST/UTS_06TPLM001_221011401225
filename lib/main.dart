@@ -1,9 +1,12 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'dart:convert';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'dart:convert';
 
 void main() {
   runApp(const MyApp());
@@ -30,17 +33,18 @@ class LockScreen extends StatefulWidget {
 }
 
 class _LockScreenState extends State<LockScreen> {
-  String city = "Loading...";
-  double currentTemp = 0;
-  double minTemp = 0;
-  double maxTemp = 0;
-  String weatherMain = "Loading...";
-  String dateStr = DateFormat('EEEE, MMMM d, yyyy').format(DateTime.now());
+  String kota = "Harap tunggu";
+  double suhu = 0;
+  double suhuRendah = 0;
+  double suhuTinggi = 0;
+  String cuaca = "Harap tunggu";
+  String tanggal = DateFormat('EEEE, MMMM d, yyyy').format(DateTime.now());
 
   @override
   void initState() {
     super.initState();
     _initLocationAndFetchWeather();
+    
   }
 
   Future<void> _initLocationAndFetchWeather() async {
@@ -50,7 +54,7 @@ class _LockScreenState extends State<LockScreen> {
       _fetchWeather();
     } else {
       setState(() {
-        city = "Akses ditolak";
+        kota = "Akses ditolak";
       });
     }
   }
@@ -73,20 +77,20 @@ class _LockScreenState extends State<LockScreen> {
         final data = json.decode(response.body);
 
         setState(() {
-          city = data['name'] ?? 'Unknown';
-          currentTemp = data['main']['temp'].toDouble();
-          minTemp = data['main']['temp_min'].toDouble();
-          maxTemp = data['main']['temp_max'].toDouble();
-          weatherMain = data['weather'][0]['main'];
+          kota = data['name'] ?? 'Unknown';
+          suhu = data['main']['temp'].toDouble();
+          suhuRendah = data['main']['temp_min'].toDouble();
+          suhuTinggi = data['main']['temp_max'].toDouble();
+          cuaca = data['weather'][0]['main'];
         });
       } else {
         setState(() {
-          city = "Failed to load data";
+          kota = "Gagal ambil data";
         });
       }
     } catch (e) {
       setState(() {
-        city = "Error: $e";
+        kota = "Error: $e";
       });
     }
   }
@@ -106,37 +110,82 @@ class _LockScreenState extends State<LockScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  city,
-                  style: const TextStyle(
-                    fontSize: 32,
+                  kota,
+                  style: TextStyle(
+                    fontSize: 38,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        color: ui.Color.fromARGB(255, 255, 255, 255),
+                        offset: Offset(2, 3),
+                        blurRadius: 20,
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 2),
                 Text(
-                  dateStr,
-                  style: const TextStyle(fontSize: 18, color: Colors.white70),
+                  tanggal,
+                  style: const TextStyle(fontSize: 22, color: Colors.white70),
                 ),
-                const SizedBox(height: 50),
+                
+                const SizedBox(height: 170),
                 Text(
-                  "${currentTemp.round()}°C",
+                  "${suhu.round()}°C",
                   style: const TextStyle(
                     fontSize: 80,
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
+                    shadows: [
+                      Shadow(
+                        color: ui.Color.fromARGB(255, 255, 255, 255),
+                        offset: Offset(2, 3),
+                        blurRadius: 30,
+                      ),
+                    ], 
                   ),
                 ),
-                const Divider(color: Colors.white70, thickness: 1),
+                const Divider(color: Colors.white, thickness: 1.5),
                 const SizedBox(height: 10),
                 Text(
-                  weatherMain,
-                  style: const TextStyle(fontSize: 24, color: Colors.white),
+                  cuaca,
+                  style: const TextStyle(
+                    fontSize: 26,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "${minTemp.round()}°C / ${maxTemp.round()}°C",
-                  style: const TextStyle(fontSize: 18, color: Colors.white70),
+                  "${suhuRendah.round()}°C / ${suhuTinggi.round()}°C",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 90),
+
+                DefaultTextStyle(
+                  style: const TextStyle(
+                    fontSize: 25,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        blurRadius: 20,
+                        color: Colors.white,
+                        offset: Offset(0.5, 0.5),
+                      ),
+                    ],
+                  ),
+                  child: AnimatedTextKit(
+                    repeatForever: true,
+                    animatedTexts: [
+                      FlickerAnimatedText('Aji Cakra Werdana'),
+                      FlickerAnimatedText('221011401225'),
+                    ],
+                  ),
                 ),
               ],
             ),
